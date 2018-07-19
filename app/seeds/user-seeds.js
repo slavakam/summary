@@ -8,8 +8,8 @@ function init() {
   _.times(20, () => {
     const userPromise = User.create({
       email: `${faker.lorem.word(2, 10)}@${faker.lorem.word(2, 10)}`,
-      firstName: faker.lorem.word(2, 10),
-      lastName: faker.lorem.word(2, 10),
+      firstName: faker.name.firstName(),
+      lastName: faker.name.lastName(),
       password: 1111,
     });
 
