@@ -1,8 +1,14 @@
 import { MONGO_URI } from '../config';
 import mongooseConnector from './mongoose-connector';
+import server from '../server';
 
-const connectorsInit = () => {
-  mongooseConnector(MONGO_URI);
+const connectorsInit = async () => {
+  try {
+    await mongooseConnector(MONGO_URI);
+  } catch (error) {
+    server.close();
+    console.log(error);
+  }
 };
 
 export {
