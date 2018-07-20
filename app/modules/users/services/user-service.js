@@ -1,8 +1,12 @@
 import { User } from '../models';
 
 export default {
-  createUser(data) {
-    return User.create(data);
+  async createUser(data) {
+    try {
+      return await User.create(data);
+    } catch (error) {
+      throw new AppError({ status: 400, ...error });
+    }
   },
 
   getUserWithPublicFields(params) {
