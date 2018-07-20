@@ -10,10 +10,14 @@ async function initSeeds() {
 
   await mongoConnection.connection.dropDatabase();
 
-  const users = await userSeeds();
-  console.log(users);
-  const summaries = await summarySeeds(users);
-  console.log(summaries);
-
-  mongoConnection.connection.close();
+  try {
+    const users = await userSeeds();
+    console.log(users);
+    const summaries = await summarySeeds(users);
+    console.log(summaries);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    mongoConnection.connection.close();
+  }
 }
