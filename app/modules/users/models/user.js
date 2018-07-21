@@ -1,6 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 import iniqueValidator from 'mongoose-unique-validator';
+import uuid from 'uuid/v4';
 
 mongoose.plugin(iniqueValidator);
 
@@ -11,6 +12,10 @@ const UserSchema = new Schema({
     lowercase: true,
     required: 'Email is required',
     trim: true,
+  },
+  hash: {
+    type: String,
+    unique: 'Hash must ne unique',
   },
   password: {
     type: String,
@@ -37,12 +42,15 @@ UserSchema.statics.createFields = ['email', 'password', 'firstName', 'lastName']
 
 UserSchema.pre('save', function(next) {
   if (!this.isModified('password')) {
-    return next();
+    const salt = bcrypt.genSaltSync(10);
+
+    this.password = bcrypt.hashSync(this.password, salt);
   }
 
-  const salt = bcrypt.genSaltSync(10);
+  if (!this.hash) {
+    this.hash = uuid();
+  }
 
-  this.password = bcrypt.hashSync(this.password, salt);
   next();
 });
 

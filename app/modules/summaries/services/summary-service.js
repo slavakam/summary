@@ -12,9 +12,13 @@ export default {
     return Summary.create(data);
   },
 
-  async updateSummary(data, summary) {
+  updateSummary(data, summary) {
     summary.set(data);
 
-    return summary.save();
+    try {
+      return summary.save();
+    } catch (error) {
+      throw new AppError({ status: 400, ...error });
+    }
   },
 };
