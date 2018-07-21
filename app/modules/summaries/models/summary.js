@@ -2,9 +2,9 @@ import mongoose, { Schema } from 'mongoose';
 import uuid from 'uuid/v4';
 
 const SummarySchema = new Schema({
-  userId: {
+  userHash: {
     type: String,
-    required: 'User is required',
+    required: 'User hash required',
   },
   title: {
     type: String,
@@ -63,7 +63,7 @@ const SummarySchema = new Schema({
       trim: true,
     },
   }],
-});
+}, { timestamps: true });
 
 SummarySchema.statics.createFields = ['title', 'phone', 'skype', 'description', 'tags', 'history', 'hash'];
 

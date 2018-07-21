@@ -7,7 +7,7 @@ export default () => async (hash, ctx, next) => {
     ctx.throw(404, `Summary with "${hash}" not found`);
   }
 
-  ctx.summary = summary;
+  ctx.state.summary = summary;
 
   await next();
 };

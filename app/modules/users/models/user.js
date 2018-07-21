@@ -41,7 +41,7 @@ const UserSchema = new Schema({
 UserSchema.statics.createFields = ['email', 'password', 'firstName', 'lastName'];
 
 UserSchema.pre('save', function(next) {
-  if (!this.isModified('password')) {
+  if (this.isModified('password')) {
     const salt = bcrypt.genSaltSync(10);
 
     this.password = bcrypt.hashSync(this.password, salt);

@@ -1,12 +1,13 @@
 import pick from 'lodash/pick';
 import { Summary } from '../models';
 import { SummaryService } from '../services';
+import parseQueryFromSearch from '../helpers/parseQueryForSearch';
 
 export default {
   async create(ctx) {
     const summaryData = {
       ...pick(ctx.request.body, Summary.createFields),
-      userId: ctx.user._id,
+      userHash: ctx.state.user.hash,
     };
 
     const { _id } = await SummaryService.createSummary(summaryData);
@@ -19,12 +20,14 @@ export default {
   async update(ctx) {
     const {
       request: { body },
-      user: { _id: userId },
-      summary,
+      state: {
+        user: { hash },
+        summary,
+      },
     } = ctx;
 
-    if (summary.userId !== userId.toHexString()) {
-      ctx.throw(403, `Forbidden. Summary with id "${summary._id}" don't belong user with id "${userId}"`);
+    if (summary.userHash !== hash) {
+      ctx.throw(403, `Forbidden. Summary with hash "${summary.hash}" don't belong user with hash "${hash}"`);
     }
 
     const newData = pick(body, Summary.createFields);
@@ -34,23 +37,38 @@ export default {
   },
 
   async delete(ctx) {
+    console.log('hello');
     const {
-      user: { _id: userId },
-      summary,
+      state: {
+        user: { hash },
+        summary,
+      },
     } = ctx;
 
-    if (summary.userId !== userId.toHexString()) {
-      ctx.throw(403, `Forbidden. Summary with id "${summary._id}" don't belong user with id "${userId}"`);
+    if (summary.userHash !== hash) {
+      ctx.throw(403, `Forbidden. Summary with hash "${summary.hash}" don't belong user with hash "${hash}"`);
     }
 
     await summary.remove();
 
-    ctx.body = { data: { id: summary._id } };
+    ctx.body = { data: { hash: summary.hash } };
   },
 
   getSummary(ctx) {
-    const { summary } = ctx;
+    const { state: { summary } } = ctx;
 
     ctx.body = { data: pick(summary, Summary.createFields) };
+  },
+
+  async searchSummaries(ctx) {
+    const queryParams = pick(ctx.request.query, ['title', 'tags', 'size', 'page']);
+    const filter = parseQueryFromSearch(queryParams);
+    const { summaries, ...rest } = await SummaryService.search(filter);
+
+    ctx.body = {
+      data: summaries,
+      filter,
+      ...rest,
+    };
   },
 };

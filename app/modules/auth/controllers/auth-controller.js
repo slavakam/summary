@@ -33,4 +33,11 @@ export default {
     const token = await jwtService.genToken({ email });
     ctx.body = { data: token };
   },
+
+  async currentUser(ctx) {
+    const { state: { user: { _id } } } = ctx;
+    const user = await UserService.getUserWithPublicFields({ _id });
+
+    ctx.body = { data: user };
+  },
 };
